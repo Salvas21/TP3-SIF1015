@@ -1,6 +1,6 @@
-# TP2-SIF1015
+# TP3-SIF1015
 
-Voici le code source du TP2 de Mickael Salvas, Xavier Loiselle et Pierik Landry.
+Voici le code source du TP3 de Mickael Salvas, Xavier Loiselle et Pierik Landry.
 
 ### Structure de dossiers pour client et server :
 - src : fichiers .c
