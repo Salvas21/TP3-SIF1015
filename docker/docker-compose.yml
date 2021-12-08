@@ -1,0 +1,9 @@
+version: "1.0"
+services:
+    sif1015-docker:
+        image: gcc
+        container_name: SIF1015
+        volumes: 
+            - ../:/sif1015
+        command: tail -F anything
+        
