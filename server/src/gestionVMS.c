@@ -28,8 +28,6 @@ extern int nbThreadAELX;
 //Semaphores
 extern sem_t semH, semQ, semnbVM, semC, semnbThreadAELX;
 
-int continueReadingFifo = 1;
-
 //#######################################
 //#
 //# Affiche une série de retour de ligne pour "nettoyer" la console
@@ -166,43 +164,19 @@ void handle_interrupt(int signal)
     exit(-2);
 }
 
-void terminateReadingFifo() {
-    continueReadingFifo = 0;
-}
-
 void readTrans(struct paramReadTrans* param) {
-//    int server_fifo_fd;
-//    server_fifo_fd = open(SERVER_FIFO_NAME, O_RDONLY);
-//    if (server_fifo_fd == -1) {
-//        fprintf(stderr, "Server Fifo Failure\n");
-//        unlink(SERVER_FIFO_NAME);
-//        exit(EXIT_FAILURE);
-//    }
-    char client_message[2000];
-    int read_size;
-
 	pthread_t tid[1000];
 	int nbThread = 0;
 	int i;
 
     int clientSocket = param->socket;
     free(param);
-//    while( (read_size = recv(clientSocket , client_message , 2000 , 0)) > 0 )
-//    {
-//        //Send the message back to client
-//        puts(client_message);
-//        write(clientSocket , client_message , strlen(client_message));
-//    }
 
     int read_res;
     struct info_FIFO_Transaction my_data;
 
-//    signal(SIGINT, terminateReadingFifo);
-
     char *tok, *sp;
-    while((read_size = recv(clientSocket , &my_data ,sizeof(my_data)  , 0)) > 0) {
-//        read_res = read(clientSocket, &my_data, sizeof(my_data));
-        puts(my_data.transaction);
+    while(recv(clientSocket, &my_data, sizeof(my_data), 0) > 0) {
         read_res = 1;
         if (read_res > 0) {
             tok = strtok_r(my_data.transaction, " ", &sp);
@@ -210,8 +184,7 @@ void readTrans(struct paramReadTrans* param) {
                 case 'A':
                 case 'a':{
                     pthread_create(&tid[nbThread++], NULL, addItem, NULL);
-//                    writeFifo("Added VM",my_data.pid_client);
-                    write(clientSocket , my_data.transaction , sizeof(my_data.transaction));
+                    writeSocket("Added VM", clientSocket);
                     break;
                 }
                 case 'E':
@@ -219,7 +192,7 @@ void readTrans(struct paramReadTrans* param) {
                     int noVM = atoi(strtok_r(NULL, " ", &sp));
                     struct paramE *ptr = (struct paramE*) malloc(sizeof(struct paramE));
                     ptr->noVM = noVM;
-                    ptr->pid = my_data.pid_client;
+                    ptr->clientSock = clientSocket;
                     pthread_create(&tid[nbThread++], NULL, removeItem, ptr);
                     break;
                 }
@@ -231,8 +204,7 @@ void readTrans(struct paramReadTrans* param) {
                     struct paramL *ptr = (struct paramL*) malloc(sizeof(struct paramL));
                     ptr->nstart = nstart;
                     ptr->nend = nend;
-                    ptr->pid = my_data.pid_client;
-
+                    ptr->clientSock = clientSocket;
                     pthread_create(&tid[nbThread++], NULL, listItems, ptr);
                     break;
                 }
@@ -243,9 +215,8 @@ void readTrans(struct paramReadTrans* param) {
 
                     struct paramX *ptr = (struct paramX*) malloc(sizeof(struct paramX));
                     ptr->noVM = noVM;
-                    ptr->pid = my_data.pid_client;
+                    ptr->clientSock = clientSocket;
                     strcpy(ptr->nomfich,(const char *)nomfich);
-
                     pthread_create(&tid[nbThread++], NULL, executeFile, ptr);
                     break;
                 }

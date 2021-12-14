@@ -11,8 +11,8 @@
 struct infoVM{
 	int		noVM;
 	unsigned char 	busy; 
-	unsigned short * 	ptrDebutVM;							
-	};								 
+	unsigned short * 	ptrDebutVM;
+	};
 
 struct noeudVM{			
 	struct infoVM	VM;		
@@ -25,20 +25,20 @@ struct noeudVM{
 struct paramX{
 	int noVM;
 	char nomfich[100];
-    int pid;
+    int clientSock;
 	};
 	
 //la structure pour le passage des parametres au thread removeItem()
 struct paramE{
 	int noVM;
-    int pid;
+    int clientSock;
 	};
 
 //la structure pour le passage des parametres au thread listItem()
 struct paramL{
 	int nstart;
 	int nend;
-    int pid;
+    int clientSock;
 	};
 
 struct info_FIFO_Transaction{
@@ -69,4 +69,4 @@ void executeFile(struct paramX* param);
 
 void readTrans(struct paramReadTrans* param);
 
-void writeFifo(char* text, int pid);
+void writeSocket(char* text, int socket);

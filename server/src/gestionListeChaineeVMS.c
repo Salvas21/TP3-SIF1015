@@ -195,7 +195,7 @@ void addItem(void * param){
 
 void removeItem(struct paramE* param){
 	int noVM = param->noVM;
-    int pid = param->pid;
+    int socket = param->clientSock;
 	free(param);
 	struct noeudVM * ptr;
 	struct noeudVM * tptr;
@@ -298,13 +298,13 @@ void removeItem(struct paramE* param){
 
     sprintf(temp, "Removed vm %d\n", noVM);
     strcat(msg, temp);
-    writeFifo(msg, pid);
+    writeSocket(msg, socket);
 }
 
 void listItems(struct paramL* param){
 	int start = param->nstart;
 	int end = param->nend;
-    int pid = param->pid;
+    int socket = param->clientSock;
 	free(param);
 	sem_wait(&semnbThreadAELX);
     nbThreadAELX++;
@@ -344,7 +344,7 @@ void listItems(struct paramL* param){
 	sprintf(temp, "===================================\n");
     strcat(msg, temp);
 
-    writeFifo(msg, pid);
+    writeSocket(msg, socket);
 
 	sem_post(&semC);
 	sem_wait(&semnbThreadAELX);
@@ -357,7 +357,7 @@ void executeFile(struct paramX* param){
 	int noVM;
     char msg[400] = "";
     char temp[400] = "";
-    int pid = param->pid;
+    int socket = param->clientSock;
 	
 	noVM = param->noVM;
 	strcpy(sourcefname, (const char*)param->nomfich);
@@ -385,7 +385,7 @@ void executeFile(struct paramX* param){
 
         sprintf(temp, "Virtual Machine unavailable\n");
         strcat(msg, temp);
-        writeFifo(msg, pid);
+        writeSocket(msg, socket);
 
         sem_post(&semC);
         //return(0);
@@ -398,7 +398,7 @@ void executeFile(struct paramX* param){
         sem_wait(&semC);
         sprintf(temp, "Failed to load image: %s\n", sourcefname);
         strcat(msg, temp);
-        writeFifo(msg, pid);
+        writeSocket(msg, socket);
 
         sem_post(&semC);
         //return(0);
@@ -692,7 +692,7 @@ void executeFile(struct paramX* param){
                 break;
         }
     }
-    writeFifo(msg, pid);
+    writeSocket(msg, socket);
 
     ptr->VM.busy = 0;
     restore_input_buffering();
@@ -704,17 +704,8 @@ void executeFile(struct paramX* param){
     pthread_exit(NULL);
 }
 
-void writeFifo(char* text, int pid) {
-    int client_fifo_fd;
-    char client_fifo[100];
+void writeSocket(char* text, int socket) {
     char message[400] = "";
-
-    sprintf(client_fifo, "/tmp/FIFO%d", pid);
-    client_fifo_fd = open(client_fifo, O_WRONLY);
-
     strcpy(message, text);
-
-    write(client_fifo_fd, message, strlen(message)+1);
-    close(client_fifo_fd);
-
+    write(socket , message , sizeof(message)+1);
 }

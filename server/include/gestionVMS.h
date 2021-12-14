@@ -100,6 +100,3 @@ void restore_input_buffering();
 
 void handle_interrupt(int signal);
 
-void terminateReadingFifo();
-
-

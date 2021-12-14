@@ -30,10 +30,8 @@ int nbThreadAELX;
 // Semaphore acces a nbVM et nbThreadALX
 sem_t semH, semQ, semnbVM, semC, semnbThreadAELX;
 
-
 int main(int argc, char* argv[]){
-
-    int sockServer , sockClient , c , read_size;
+    int sockServer , sockClient , c;
     struct sockaddr_in server , client;
 
 	head = NULL;
@@ -46,8 +44,6 @@ int main(int argc, char* argv[]){
 	sem_init(&semnbVM, 0, 1);
 	sem_init(&semC, 0, 1);
 	sem_init(&semnbThreadAELX, 0, 1);
-	
-//    mkfifo(SERVER_FIFO_NAME, 0777);
 
     sockServer = socket(AF_INET, SOCK_STREAM, 0);
     if (sockServer == -1)
@@ -68,9 +64,8 @@ int main(int argc, char* argv[]){
     listen(sockServer, 5);
     pthread_t tid[1000];
     int nbThread = 0;
-    int i;
-    while (1) {
 
+    while (1) {
         c = sizeof(struct sockaddr_in);
         sockClient = accept(sockServer, (struct sockaddr *)&client, (socklen_t*)&c);
         puts("Connection accepted");
@@ -79,11 +74,10 @@ int main(int argc, char* argv[]){
         pthread_create(&tid[nbThread++], NULL, readTrans, ptr);
     }
 
+    int i;
     for(i=0; i<nbThread;i++) {
         pthread_join(tid[i], NULL);
     }
-//    readTrans();
-
     exit(0);
 }
 
