@@ -32,6 +32,11 @@ sem_t semH, semQ, semnbVM, semC, semnbThreadAELX;
 
 
 int main(int argc, char* argv[]){
+    int serverLen, clientLen;
+    struct sockaddr_in server;
+    struct sockaddr_in client;
+    int sockServer, sockClient;
+    int c;
 	head = NULL;
 	queue = NULL;
 	nbVM = 0;
@@ -43,10 +48,31 @@ int main(int argc, char* argv[]){
 	sem_init(&semC, 0, 1);
 	sem_init(&semnbThreadAELX, 0, 1);
 	
-    mkfifo(SERVER_FIFO_NAME, 0777);
+//    mkfifo(SERVER_FIFO_NAME, 0777);
 
-    readTrans();
-    unlink(SERVER_FIFO_NAME);
+    sockServer = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockServer == -1)
+    {
+        perror("Could not create socket");
+        return 1;
+    }
+
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = INADDR_ANY;
+    server.sin_port = htons( 8888 );
+    if(bind(sockServer,(struct sockaddr *)&server , sizeof(server)) < 0)
+    {
+        perror("bind failed. Error");
+        return 1;
+    }
+
+    listen(sockServer, 5);
+    while (1) {
+        c = sizeof(struct sockaddr_in);
+        sockClient = accept(sockServer, (struct sockaddr *)&client, (socklen_t*)&c);
+        printf("Connection accepted");
+    }
+//    readTrans();
 
     exit(0);
 }
