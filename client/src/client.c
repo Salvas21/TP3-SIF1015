@@ -295,8 +295,3 @@ void *serverWindowThread()
 
    pthread_exit(NULL);
 }
-
-//    char left, right, top, bottom, tlc, trc, blc, brc;
-//    left = right = top = bottom = tlc = trc = blc = brc = 42;
-//    wborder(serverWindow, left, right, top, bottom, tlc, trc, blc, brc);
-//    wrefresh(serverWindow);
