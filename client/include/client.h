@@ -17,6 +17,8 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
 struct info_FIFO_Transaction {
     pid_t pid_client;

@@ -9,12 +9,48 @@ int main()
     //init the screen
     initScreen();
 
-    server_fifo_fd = open(SERVER_FIFO_NAME, O_WRONLY | O_NONBLOCK);
-    if (server_fifo_fd == -1) {
-        printw("Server Fifo Failure\n");
-        exit(EXIT_FAILURE);
+    //CREATE FIFO
+//    server_fifo_fd = open(SERVER_FIFO_NAME, O_WRONLY | O_NONBLOCK);
+//    if (server_fifo_fd == -1) {
+//        printw("Server Fifo Failure\n");
+//        exit(EXIT_FAILURE);
+//    }
+
+    char client_request[] = "Hello";
+    char buffer[1024] = {0};
+    int network_socket;
+
+    // Create a stream socket
+    network_socket = socket(AF_INET,
+                            SOCK_STREAM, 0);
+
+    // Initialise port number and address
+    struct sockaddr_in server_address;
+    server_address.sin_family = AF_INET;
+    server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server_address.sin_port = htons(8888);
+
+    // Initiate a socket connection
+    int connection_status = connect(network_socket,
+                                    (struct sockaddr*)&server_address,
+                                    sizeof(server_address));
+
+    if (connection_status < 0) {
+        puts("Error\n");
+        return 0;
     }
 
+    printf("Connection established\n");
+
+    // Send data to the socket
+    send(network_socket, &client_request,
+         sizeof(client_request), 0);
+
+    valread = read(network_socket , buffer, 1024);
+    printf("%s\n",buffer );
+
+    // Close the connection
+    close(network_socket);
 
     //init color
     initColors();
@@ -130,10 +166,11 @@ int main()
 
         }
     }
-    //deallocate and end ncurses
-    close(server_fifo_fd);
-    close(client_fifo_fd);
-    unlink(client_fifo);
+
+    //CLOSE FIFO
+//    close(server_fifo_fd);
+//    close(client_fifo_fd);
+//    unlink(client_fifo);
     endwin();
     pthread_exit(NULL);
 }
@@ -190,32 +227,32 @@ int executeCommand(WINDOW * window,const char * text_char, int commandLine)
     {
         case 'a':
         case 'A':
-            sendDataToFifo(text_char);
+           // sendDataToFifo(text_char);
             return 0;
         case 'l':
         case 'L':
-            sendDataToFifo(text_char);
+          //  sendDataToFifo(text_char);
             return 0;
         case 'x':
         case 'X':
-            sendDataToFifo(text_char);
+          //  sendDataToFifo(text_char);
             return 0;
         case 'e':
         case 'E':
-            sendDataToFifo(text_char);
+         //   sendDataToFifo(text_char);
             return 0;
 
     }
     return -1;
 }
 
-void sendDataToFifo(const char * text_char)
-{
-    struct info_FIFO_Transaction my_data;
-    my_data.pid_client = getpid();
-    sprintf(my_data.transaction, "%s", text_char);
-    write(server_fifo_fd, &my_data, sizeof(my_data));
-}
+//void sendDataToFifo(const char * text_char)
+//{
+//    struct info_FIFO_Transaction my_data;
+//    my_data.pid_client = getpid();
+//    sprintf(my_data.transaction, "%s", text_char);
+//    write(server_fifo_fd, &my_data, sizeof(my_data));
+//}
 
 char *appendChar(char *szString, size_t strsize, char c)
 {
@@ -248,21 +285,23 @@ void clearWindow(WINDOW *window, const char * text_window)
 
 void *serverWindowThread()
 {
-    sprintf(client_fifo, CLIENT_FIFO_NAME, getpid());
-    if (mkfifo(client_fifo,0777) == -1) {
-        printw("Cant make fifo %s\n",client_fifo);
-        exit(EXIT_FAILURE);
-    }
+    //CREATE FIFO
+//    sprintf(client_fifo, CLIENT_FIFO_NAME, getpid());
+//    if (mkfifo(client_fifo,0777) == -1) {
+//        printw("Cant make fifo %s\n",client_fifo);
+//        exit(EXIT_FAILURE);
+//    }
 
     werase(serverWindow);
-    client_fifo_fd = open(client_fifo, O_RDONLY);
+//    client_fifo_fd = open(client_fifo, O_RDONLY);
     char message[400] = "";
     int i = 0;
-    int read_res;
+    int read_res = 0;
 
     while (1)
     {
-        read_res = read(client_fifo_fd, message, 400);
+        //READ FROM FIFO
+        //read_res = read(client_fifo_fd, message, 400);
         if (read_res > 0) {
             if (i > 20) {
                 i = 0;
@@ -277,10 +316,10 @@ void *serverWindowThread()
         }
         //memset(message, 0, sizeof message);
     }
-    close(client_fifo_fd);
-    unlink(client_fifo);
+//    close(client_fifo_fd);
+//    unlink(client_fifo);
 
-    pthread_exit(NULL);
+//    pthread_exit(NULL);
 }
 
 //    char left, right, top, bottom, tlc, trc, blc, brc;
