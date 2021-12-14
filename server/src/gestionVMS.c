@@ -187,12 +187,12 @@ void readTrans(struct paramReadTrans* param) {
 
     int clientSocket = param->socket;
     free(param);
-//    while( (read_size = recv(clientSocket , client_message , 2000 , 0)) > 0 )
-//    {
-//        //Send the message back to client
-//        puts(client_message);
-//        write(clientSocket , client_message , strlen(client_message));
-//    }
+    while( (read_size = recv(clientSocket , client_message , 2000 , 0)) > 0 )
+    {
+        //Send the message back to client
+        puts(client_message);
+        write(clientSocket , client_message , strlen(client_message));
+    }
 
     int read_res;
     struct info_FIFO_Transaction my_data;
@@ -200,58 +200,58 @@ void readTrans(struct paramReadTrans* param) {
 //    signal(SIGINT, terminateReadingFifo);
 
     char *tok, *sp;
-    while((read_size = recv(clientSocket , &my_data ,sizeof(my_data)  , 0)) > 0) {
-//        read_res = read(clientSocket, &my_data, sizeof(my_data));
-        puts(my_data.transaction);
-        read_res = 1;
-        if (read_res > 0) {
-            tok = strtok_r(my_data.transaction, " ", &sp);
-            switch(tok[0]){
-                case 'A':
-                case 'a':{
-                    pthread_create(&tid[nbThread++], NULL, addItem, NULL);
-//                    writeFifo("Added VM",my_data.pid_client);
-                    break;
-                }
-                case 'E':
-                case 'e':{
-                    int noVM = atoi(strtok_r(NULL, " ", &sp));
-                    struct paramE *ptr = (struct paramE*) malloc(sizeof(struct paramE));
-                    ptr->noVM = noVM;
-                    ptr->pid = my_data.pid_client;
-                    pthread_create(&tid[nbThread++], NULL, removeItem, ptr);
-                    break;
-                }
-                case 'L':
-                case 'l':{
-                    int nstart = atoi(strtok_r(NULL, "-", &sp));
-                    int nend = atoi(strtok_r(NULL, " ", &sp));
-
-                    struct paramL *ptr = (struct paramL*) malloc(sizeof(struct paramL));
-                    ptr->nstart = nstart;
-                    ptr->nend = nend;
-                    ptr->pid = my_data.pid_client;
-
-                    pthread_create(&tid[nbThread++], NULL, listItems, ptr);
-                    break;
-                }
-                case 'X':
-                case 'x':{
-                    int noVM = atoi(strtok_r(NULL, " ", &sp));
-                    char *nomfich = strtok_r(NULL, "\n", &sp);
-
-                    struct paramX *ptr = (struct paramX*) malloc(sizeof(struct paramX));
-                    ptr->noVM = noVM;
-                    ptr->pid = my_data.pid_client;
-                    strcpy(ptr->nomfich,(const char *)nomfich);
-
-                    pthread_create(&tid[nbThread++], NULL, executeFile, ptr);
-                    break;
-                }
-            }
-        }
-        memset(&my_data,0, sizeof(my_data));
-    }
+//    while((read_size = recv(clientSocket , &my_data ,sizeof(my_data)  , 0)) > 0) {
+////        read_res = read(clientSocket, &my_data, sizeof(my_data));
+//        puts(my_data.transaction);
+//        read_res = 1;
+//        if (read_res > 0) {
+//            tok = strtok_r(my_data.transaction, " ", &sp);
+//            switch(tok[0]){
+//                case 'A':
+//                case 'a':{
+//                    pthread_create(&tid[nbThread++], NULL, addItem, NULL);
+////                    writeFifo("Added VM",my_data.pid_client);
+//                    break;
+//                }
+//                case 'E':
+//                case 'e':{
+//                    int noVM = atoi(strtok_r(NULL, " ", &sp));
+//                    struct paramE *ptr = (struct paramE*) malloc(sizeof(struct paramE));
+//                    ptr->noVM = noVM;
+//                    ptr->pid = my_data.pid_client;
+//                    pthread_create(&tid[nbThread++], NULL, removeItem, ptr);
+//                    break;
+//                }
+//                case 'L':
+//                case 'l':{
+//                    int nstart = atoi(strtok_r(NULL, "-", &sp));
+//                    int nend = atoi(strtok_r(NULL, " ", &sp));
+//
+//                    struct paramL *ptr = (struct paramL*) malloc(sizeof(struct paramL));
+//                    ptr->nstart = nstart;
+//                    ptr->nend = nend;
+//                    ptr->pid = my_data.pid_client;
+//
+//                    pthread_create(&tid[nbThread++], NULL, listItems, ptr);
+//                    break;
+//                }
+//                case 'X':
+//                case 'x':{
+//                    int noVM = atoi(strtok_r(NULL, " ", &sp));
+//                    char *nomfich = strtok_r(NULL, "\n", &sp);
+//
+//                    struct paramX *ptr = (struct paramX*) malloc(sizeof(struct paramX));
+//                    ptr->noVM = noVM;
+//                    ptr->pid = my_data.pid_client;
+//                    strcpy(ptr->nomfich,(const char *)nomfich);
+//
+//                    pthread_create(&tid[nbThread++], NULL, executeFile, ptr);
+//                    break;
+//                }
+//            }
+//        }
+//        memset(&my_data,0, sizeof(my_data));
+//    }
 
 	for(i=0; i<nbThread;i++) {
 		pthread_join(tid[i], NULL);
