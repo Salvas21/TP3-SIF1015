@@ -32,11 +32,9 @@ sem_t semH, semQ, semnbVM, semC, semnbThreadAELX;
 
 
 int main(int argc, char* argv[]){
-    int serverLen, clientLen;
-    struct sockaddr_in server;
-    struct sockaddr_in client;
-    int sockServer, sockClient;
-    int c;
+    int sockServer , sockClient , c , read_size;
+    struct sockaddr_in server , client;
+
 	head = NULL;
 	queue = NULL;
 	nbVM = 0;
@@ -70,7 +68,7 @@ int main(int argc, char* argv[]){
     while (1) {
         c = sizeof(struct sockaddr_in);
         sockClient = accept(sockServer, (struct sockaddr *)&client, (socklen_t*)&c);
-        printf("Connection accepted");
+        puts("Connection accepted");
     }
 //    readTrans();
 

@@ -18,7 +18,7 @@ int main()
 
     char client_request[] = "Hello";
     char buffer[1024] = {0};
-    int network_socket;
+    int network_socket, valread;
 
     // Create a stream socket
     network_socket = socket(AF_INET,
