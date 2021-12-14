@@ -14,10 +14,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
+
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
+
 #include <arpa/inet.h>
 
 struct info_FIFO_Transaction {
@@ -27,6 +29,8 @@ struct info_FIFO_Transaction {
 
 int server_fifo_fd, client_fifo_fd;
 char client_fifo[256];
+
+int sock;
 
 WINDOW *serverWindow;
 
