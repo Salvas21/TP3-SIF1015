@@ -70,7 +70,7 @@ int main(int argc, char* argv[]){
     int nbThread = 0;
     int i;
     while (1) {
-        puts("Hi");
+
         c = sizeof(struct sockaddr_in);
         sockClient = accept(sockServer, (struct sockaddr *)&client, (socklen_t*)&c);
         puts("Connection accepted");
