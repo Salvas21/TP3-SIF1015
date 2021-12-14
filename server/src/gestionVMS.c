@@ -211,7 +211,7 @@ void readTrans(struct paramReadTrans* param) {
                 case 'a':{
                     pthread_create(&tid[nbThread++], NULL, addItem, NULL);
 //                    writeFifo("Added VM",my_data.pid_client);
-                    write(clientSocket , client_message , strlen(client_message));
+                    write(clientSocket , my_data.transaction , sizeof(my_data.transaction));
                     break;
                 }
                 case 'E':
