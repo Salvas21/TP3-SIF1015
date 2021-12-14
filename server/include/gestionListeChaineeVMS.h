@@ -46,6 +46,10 @@ struct info_FIFO_Transaction{
     char transaction[200];
 };
 
+struct paramReadTrans{
+    int socket;
+};
+
 
 
 void cls(void);
@@ -63,6 +67,6 @@ void saveItems(const char* sourcefname);
 //la structure paramX pour le passage des parametres au thread executeFile()
 void executeFile(struct paramX* param);
 
-void* readTrans();
+void readTrans(struct paramReadTrans* param);
 
 void writeFifo(char* text, int pid);

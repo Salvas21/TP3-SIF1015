@@ -32,6 +32,7 @@ sem_t semH, semQ, semnbVM, semC, semnbThreadAELX;
 
 
 int main(int argc, char* argv[]){
+
     int sockServer , sockClient , c , read_size;
     struct sockaddr_in server , client;
 
@@ -65,10 +66,21 @@ int main(int argc, char* argv[]){
     }
 
     listen(sockServer, 5);
+    pthread_t tid[1000];
+    int nbThread = 0;
+    int i;
     while (1) {
+        puts("Hi");
         c = sizeof(struct sockaddr_in);
         sockClient = accept(sockServer, (struct sockaddr *)&client, (socklen_t*)&c);
         puts("Connection accepted");
+        struct paramReadTrans *ptr = (struct paramReadTrans*) malloc(sizeof(struct paramReadTrans));
+        ptr->socket = sockClient;
+        pthread_create(&tid[nbThread++], NULL, readTrans, ptr);
+    }
+
+    for(i=0; i<nbThread;i++) {
+        pthread_join(tid[i], NULL);
     }
 //    readTrans();
 

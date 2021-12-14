@@ -170,34 +170,47 @@ void terminateReadingFifo() {
     continueReadingFifo = 0;
 }
 
-void* readTrans() {
-    int server_fifo_fd;
-    server_fifo_fd = open(SERVER_FIFO_NAME, O_RDONLY);
-    if (server_fifo_fd == -1) {
-        fprintf(stderr, "Server Fifo Failure\n");
-        unlink(SERVER_FIFO_NAME);
-        exit(EXIT_FAILURE);
-    }
+void readTrans(struct paramReadTrans* param) {
+//    int server_fifo_fd;
+//    server_fifo_fd = open(SERVER_FIFO_NAME, O_RDONLY);
+//    if (server_fifo_fd == -1) {
+//        fprintf(stderr, "Server Fifo Failure\n");
+//        unlink(SERVER_FIFO_NAME);
+//        exit(EXIT_FAILURE);
+//    }
+    char client_message[2000];
+    int read_size;
 
 	pthread_t tid[1000];
 	int nbThread = 0;
 	int i;
 
+    int clientSocket = param->socket;
+    free(param);
+//    while( (read_size = recv(clientSocket , client_message , 2000 , 0)) > 0 )
+//    {
+//        //Send the message back to client
+//        puts(client_message);
+//        write(clientSocket , client_message , strlen(client_message));
+//    }
+
     int read_res;
     struct info_FIFO_Transaction my_data;
 
-    signal(SIGINT, terminateReadingFifo);
+//    signal(SIGINT, terminateReadingFifo);
 
     char *tok, *sp;
-    while(continueReadingFifo == 1) {
-        read_res = read(server_fifo_fd, &my_data, sizeof(my_data));
+    while((read_size = recv(clientSocket , &my_data ,sizeof(my_data)  , 0)) > 0) {
+//        read_res = read(clientSocket, &my_data, sizeof(my_data));
+        puts(my_data.transaction);
+        read_res = 1;
         if (read_res > 0) {
             tok = strtok_r(my_data.transaction, " ", &sp);
             switch(tok[0]){
                 case 'A':
                 case 'a':{
                     pthread_create(&tid[nbThread++], NULL, addItem, NULL);
-                    writeFifo("Added VM",my_data.pid_client);
+//                    writeFifo("Added VM",my_data.pid_client);
                     break;
                 }
                 case 'E':
@@ -243,8 +256,7 @@ void* readTrans() {
 	for(i=0; i<nbThread;i++) {
 		pthread_join(tid[i], NULL);
 	}
-    close(server_fifo_fd);
-	return NULL;
+    pthread_exit(0);
 }
 
 
