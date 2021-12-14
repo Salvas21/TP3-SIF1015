@@ -22,23 +22,22 @@
 
 #include <arpa/inet.h>
 
-struct info_FIFO_Transaction {
+struct info_socket_Transaction {
     pid_t pid_client;
     char transaction[200];
 };
 
-int server_fifo_fd, client_fifo_fd;
-char client_fifo[256];
-
 int sock;
+int connection_status;
 
 WINDOW *serverWindow;
 
 char *appendChar(char *szString, size_t strsize, char c);
 void initScreen();
 void initColors();
+void initSocket();
 void writeCommandOnWindow(WINDOW *window, const char * text_char, int commandLine);
-void sendDataToFifo(const char * text_char);
+void sendDataToSocket(const char * text_char);
 void writeRainbowText(WINDOW *window, const char * text_char, int commandLine);
 int executeCommand(WINDOW * window, const char * text_char, int commandLine);
 WINDOW *createWindow(int height, int width, int position_y, int position_x, const char * text_window);

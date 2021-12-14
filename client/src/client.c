@@ -7,30 +7,10 @@ int main()
 {
 
     //init the screen
-   initScreen();
+    initScreen();
 
-    //CREATE FIFO
-//    server_fifo_fd = open(SERVER_FIFO_NAME, O_WRONLY | O_NONBLOCK);
-//    if (server_fifo_fd == -1) {
-//        printw("Server Fifo Failure\n");
-//        exit(EXIT_FAILURE);
-//    }
-
-
-    // Create a stream socket
-    sock = socket(AF_INET,
-                            SOCK_STREAM, 0);
-
-    // Initialise port number and address
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = INADDR_ANY;
-    server_address.sin_port = htons(8888);
-
-    // Initiate a socket connection
-    int connection_status = connect(sock,
-                                    (struct sockaddr*)&server_address,
-                                    sizeof(server_address));
+    //init socket
+    initSocket();
 
     //init color
     initColors();
@@ -156,11 +136,6 @@ int main()
         }
     }
 
-    //CLOSE FIFO
-//    close(server_fifo_fd);
-//    close(client_fifo_fd);
-//    unlink(client_fifo);
-
     // Close the connection
     close(sock);
     endwin();
@@ -187,6 +162,21 @@ void initColors()
         exit(1);
     }
     start_color();
+}
+
+void initSocket()
+{
+    // Create a stream socket
+    sock = socket(AF_INET,SOCK_STREAM, 0);
+
+    // Initialise port number and address
+    struct sockaddr_in server_address;
+    server_address.sin_family = AF_INET;
+    server_address.sin_addr.s_addr = INADDR_ANY;
+    server_address.sin_port = htons(8888);
+
+    // Initiate a socket connection
+    connection_status = connect(sock,(struct sockaddr*)&server_address,sizeof(server_address));
 }
 
 void writeCommandOnWindow(WINDOW *window, const char * text_char, int commandLine)
@@ -219,28 +209,28 @@ int executeCommand(WINDOW * window,const char * text_char, int commandLine)
     {
         case 'a':
         case 'A':
-            sendDataToFifo(text_char);
+            sendDataToSocket(text_char);
             return 0;
         case 'l':
         case 'L':
-            sendDataToFifo(text_char);
+            sendDataToSocket(text_char);
             return 0;
         case 'x':
         case 'X':
-            sendDataToFifo(text_char);
+            sendDataToSocket(text_char);
             return 0;
         case 'e':
         case 'E':
-            sendDataToFifo(text_char);
+            sendDataToSocket(text_char);
             return 0;
 
     }
     return -1;
 }
 
-void sendDataToFifo(const char * text_char)
+void sendDataToSocket(const char * text_char)
 {
-    struct info_FIFO_Transaction my_data;
+    struct info_socket_Transaction my_data;
     my_data.pid_client = getpid();
     sprintf(my_data.transaction, "%s", text_char);
     if (send(sock, &my_data, sizeof(my_data), 0) < 0) {
@@ -280,26 +270,15 @@ void clearWindow(WINDOW *window, const char * text_window)
 
 void *serverWindowThread()
 {
-    //CREATE FIFO
-//    sprintf(client_fifo, CLIENT_FIFO_NAME, getpid());
-//    if (mkfifo(client_fifo,0777) == -1) {
-//        printw("Cant make fifo %s\n",client_fifo);
-//        exit(EXIT_FAILURE);
-//    }
-
     werase(serverWindow);
-//    client_fifo_fd = open(client_fifo, O_RDONLY);
     char message[400] = "";
     int i = 0;
-    int read_res = 0;
 
     while (1)
     {
         if (recv(sock,message, sizeof(message),0) < 0) {
             mvwprintw(serverWindow,i+1,1,"Could not read from server.");
         }
-        //READ FROM FIFO
-        //read_res = read(client_fifo_fd, message, 400);
         if (strlen(message) > 0) {
             if (i > 20) {
                 i = 0;
@@ -312,12 +291,9 @@ void *serverWindowThread()
             box(serverWindow,0,0);
             wrefresh(serverWindow);
         }
-        //memset(message, 0, sizeof message);
     }
-//    close(client_fifo_fd);
-//    unlink(client_fifo);
 
-//    pthread_exit(NULL);
+   pthread_exit(NULL);
 }
 
 //    char left, right, top, bottom, tlc, trc, blc, brc;
