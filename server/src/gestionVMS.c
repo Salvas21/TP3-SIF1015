@@ -173,18 +173,19 @@ void readTrans(struct paramReadTrans* param) {
     free(param);
 
     int read_res;
-    struct info_FIFO_Transaction my_data;
+    struct info_FIFO_Transaction infoTransaction;
 
     char *tok, *sp;
-    while(recv(clientSocket, &my_data, sizeof(my_data), 0) > 0) {
+    while(recv(clientSocket, &infoTransaction, sizeof(infoTransaction), 0) > 0) {
         read_res = 1;
         if (read_res > 0) {
-            tok = strtok_r(my_data.transaction, " ", &sp);
+            tok = strtok_r(infoTransaction.transaction, " ", &sp);
             switch(tok[0]){
                 case 'A':
                 case 'a':{
-                    pthread_create(&tid[nbThread++], NULL, addItem, NULL);
-                    writeSocket("Added VM", clientSocket);
+                    struct paramA *ptr = (struct paramA*) malloc(sizeof(struct paramA));
+                    ptr->clientSock = clientSocket;
+                    pthread_create(&tid[nbThread++], NULL, addItem, ptr);
                     break;
                 }
                 case 'E':
@@ -212,7 +213,6 @@ void readTrans(struct paramReadTrans* param) {
                 case 'x':{
                     int noVM = atoi(strtok_r(NULL, " ", &sp));
                     char *nomfich = strtok_r(NULL, "\n", &sp);
-
                     struct paramX *ptr = (struct paramX*) malloc(sizeof(struct paramX));
                     ptr->noVM = noVM;
                     ptr->clientSock = clientSocket;
@@ -222,7 +222,7 @@ void readTrans(struct paramReadTrans* param) {
                 }
             }
         }
-        memset(&my_data,0, sizeof(my_data));
+        memset(&infoTransaction,0, sizeof(infoTransaction));
     }
 
 	for(i=0; i<nbThread;i++) {
