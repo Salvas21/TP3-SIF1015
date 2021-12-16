@@ -16,9 +16,9 @@
 #include "../include/gestionVMS.h"
 
 //Pointeur de tête de liste
-struct noeud* head;
+struct noeud *head;
 //Pointeur de queue de liste pour ajout rapide
-struct noeud* queue;
+struct noeud *queue;
 // nombre de VM actives
 int nbVM;
 
@@ -30,33 +30,31 @@ int nbThreadAELX;
 // Semaphore acces a nbVM et nbThreadALX
 sem_t semH, semQ, semnbVM, semC, semnbThreadAELX;
 
-int main(int argc, char* argv[]){
-    int sockServer , sockClient , c;
-    struct sockaddr_in server , client;
+int main(int argc, char *argv[]) {
+    int sockServer, sockClient, c;
+    struct sockaddr_in server, client;
 
-	head = NULL;
-	queue = NULL;
-	nbVM = 0;
-	nbThreadAELX = 0;
-	
-	sem_init(&semH, 0, 1);
-	sem_init(&semQ, 0, 1);
-	sem_init(&semnbVM, 0, 1);
-	sem_init(&semC, 0, 1);
-	sem_init(&semnbThreadAELX, 0, 1);
+    head = NULL;
+    queue = NULL;
+    nbVM = 0;
+    nbThreadAELX = 0;
+
+    sem_init(&semH, 0, 1);
+    sem_init(&semQ, 0, 1);
+    sem_init(&semnbVM, 0, 1);
+    sem_init(&semC, 0, 1);
+    sem_init(&semnbThreadAELX, 0, 1);
 
     sockServer = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockServer == -1)
-    {
+    if (sockServer == -1) {
         perror("Could not create socket");
         return 1;
     }
 
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons( 8888 );
-    if(bind(sockServer,(struct sockaddr *)&server , sizeof(server)) < 0)
-    {
+    server.sin_port = htons(8888);
+    if (bind(sockServer, (struct sockaddr *) &server, sizeof(server)) < 0) {
         perror("bind failed. Error");
         return 1;
     }
@@ -67,15 +65,15 @@ int main(int argc, char* argv[]){
 
     while (1) {
         c = sizeof(struct sockaddr_in);
-        sockClient = accept(sockServer, (struct sockaddr *)&client, (socklen_t*)&c);
+        sockClient = accept(sockServer, (struct sockaddr *) &client, (socklen_t * ) & c);
         puts("Connection accepted");
-        struct paramReadTrans *ptr = (struct paramReadTrans*) malloc(sizeof(struct paramReadTrans));
+        struct paramReadTrans *ptr = (struct paramReadTrans *) malloc(sizeof(struct paramReadTrans));
         ptr->socket = sockClient;
         pthread_create(&tid[nbThread++], NULL, readTrans, ptr);
     }
 
     int i;
-    for(i=0; i<nbThread;i++) {
+    for (i = 0; i < nbThread; i++) {
         pthread_join(tid[i], NULL);
     }
     exit(0);

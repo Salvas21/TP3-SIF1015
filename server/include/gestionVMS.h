@@ -21,24 +21,13 @@
 #define SERVER_FIFO_NAME "/tmp/FIFO_TRANSACTIONS"
 
 /* Registers */
-enum
-{
-    R_R0 = 0,
-    R_R1,
-    R_R2,
-    R_R3,
-    R_R4,
-    R_R5,
-    R_R6,
-    R_R7,
-    R_PC, /* program counter */
-    R_COND,
-    R_COUNT
+enum {
+    R_R0 = 0, R_R1, R_R2, R_R3, R_R4, R_R5, R_R6, R_R7, R_PC, /* program counter */
+    R_COND, R_COUNT
 };
 
 /* Opcodes */
-enum
-{
+enum {
     OP_BR = 0, /* branch */
     OP_ADD,    /* add  */
     OP_LD,     /* load */
@@ -58,23 +47,20 @@ enum
 };
 
 /* Condition Flags */
-enum
-{
+enum {
     FL_POS = 1 << 0, /* P */
     FL_ZRO = 1 << 1, /* Z */
     FL_NEG = 1 << 2, /* N */
 };
 
 /* Memory Mapped Registers */
-enum
-{
+enum {
     MR_KBSR = 0xFE00, /* keyboard status */
     MR_KBDR = 0xFE02  /* keyboard data */
 };
 
 /* TRAP Codes */
-enum
-{
+enum {
     TRAP_GETC = 0x20,  /* get character from keyboard, not echoed onto the terminal */
     TRAP_OUT = 0x21,   /* output a character */
     TRAP_PUTS = 0x22,  /* output a word string */
@@ -86,16 +72,23 @@ enum
 // Function prototypes
 
 uint16_t sign_extend(uint16_t x, int bit_count);
+
 uint16_t swap16(uint16_t x);
+
 void update_flags(uint16_t reg[R_COUNT], uint16_t r);
-int read_image_file(uint16_t * memory, char* image_path, uint16_t * origin);
+
+int read_image_file(uint16_t *memory, char *image_path, uint16_t *origin);
+
 uint16_t check_key();
-void mem_write(uint16_t * memory, uint16_t address, uint16_t val);
-uint16_t mem_read(uint16_t * memory, uint16_t address);
+
+void mem_write(uint16_t *memory, uint16_t address, uint16_t val);
+
+uint16_t mem_read(uint16_t *memory, uint16_t address);
 
 //struct termios original_tio;
 
 void disable_input_buffering();
+
 void restore_input_buffering();
 
 void handle_interrupt(int signal);

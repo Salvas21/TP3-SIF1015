@@ -33,15 +33,25 @@ int connection_status;
 WINDOW *serverWindow;
 
 char *appendChar(char *szString, size_t strsize, char c);
+
 void initScreen();
+
 void initColors();
+
 void initSocket();
-void writeCommandOnWindow(WINDOW *window, const char * text_char, int commandLine);
-void sendDataToSocket(const char * text_char);
-void writeRainbowText(WINDOW *window, const char * text_char, int commandLine);
-int executeCommand(WINDOW * window, const char * text_char, int commandLine);
-WINDOW *createWindow(int height, int width, int position_y, int position_x, const char * text_window);
-void clearWindow(WINDOW *window, const char * text_window);
+
+void writeCommandOnWindow(WINDOW *window, const char *text_char, int commandLine);
+
+void sendDataToSocket(const char *text_char);
+
+void writeRainbowText(WINDOW *window, const char *text_char, int commandLine);
+
+int executeCommand(WINDOW *window, const char *text_char, int commandLine);
+
+WINDOW *createWindow(int height, int width, int position_y, int position_x, const char *text_window);
+
+void clearWindow(WINDOW *window, const char *text_window);
+
 void *serverWindowThread();
 
 #endif //TP2_SIF1015_CLIENT_H
